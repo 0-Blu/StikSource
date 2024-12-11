@@ -63,7 +63,8 @@ This will fetch the data from the provided URL and display:
   - Developer
   - Description
   - Screenshots
-  - Additional metadata.
+  - Additional metadata
+  - Tint Color
 
 ---
 
