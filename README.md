@@ -93,48 +93,49 @@ import StikSource
 struct ManualFetchView: View {
     @StateObject private var manager = StikSourceManager()
     @State private var isLoading = false
-
+    
     let sourceURL = "placeholder"
 
     var body: some View {
-        VStack {
-            if isLoading {
-                ProgressView("Loading...")
-            } else if let source = manager.source {
-                Text(source.name)
-                    .font(.largeTitle)
-                    .padding()
-
-                List(source.apps) { app in
-                    HStack {
-                        AsyncImage(url: URL(string: app.iconURL)) { image in
-                            image.resizable()
-                        } placeholder: {
-                            Color.gray.opacity(0.3)
-                        }
-                        .frame(width: 50, height: 50)
-                        .cornerRadius(10)
-
-                        VStack(alignment: .leading) {
-                            Text(app.name).font(.headline)
-                            Text(app.developerName)
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
+        NavigationView {
+            VStack {
+                if isLoading {
+                    ProgressView("Loading...")
+                } else if let source = manager.source {
+                    List(source.apps) { app in
+                        NavigationLink(destination: AppDetailView(app: app)) {
+                            HStack {
+                                AsyncImage(url: URL(string: app.iconURL)) { image in
+                                    image.resizable()
+                                } placeholder: {
+                                    Color.gray.opacity(0.3)
+                                }
+                                .frame(width: 50, height: 50)
+                                .cornerRadius(10)
+                                
+                                VStack(alignment: .leading) {
+                                    Text(app.name).font(.headline)
+                                    Text(app.developerName)
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                }
+                            }
                         }
                     }
+                    .navigationTitle(source.name)
+                } else {
+                    Text("No data available.")
                 }
-            } else {
-                Text("No data available.")
             }
-        }
-        .task {
-            isLoading = true
-            do {
-                try await manager.fetchSource(from: sourceURL)
-                isLoading = false
-            } catch {
-                print("Failed to fetch data: \(error.localizedDescription)")
-                isLoading = false
+            .task {
+                isLoading = true
+                do {
+                    try await manager.fetchSource(from: sourceURL)
+                    isLoading = false
+                } catch {
+                    print("Failed to fetch data: \(error.localizedDescription)")
+                    isLoading = false
+                }
             }
         }
     }
