@@ -16,63 +16,106 @@ public struct AppDetailView: View {
 
     public var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 20) {
                 // App Icon
                 AsyncImage(url: URL(string: app.iconURL)) { image in
                     image.resizable()
+                        .scaledToFit()
                 } placeholder: {
                     Color.gray.opacity(0.3)
                 }
-                .frame(width: 100, height: 100)
-                .cornerRadius(20)
-                .padding(.top)
-                
-                // App Name and Developer
-                VStack(alignment: .leading) {
+                .frame(width: 120, height: 120)
+                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .shadow(radius: 5)
+                .padding(.horizontal)
+
+                // App Title & Developer
+                VStack(alignment: .leading, spacing: 10) {
                     Text(app.name)
                         .font(.largeTitle)
-                        .bold()
+                        .fontWeight(.bold)
+
                     Text("by \(app.developerName)")
-                        .font(.title3)
-                        .foregroundColor(.gray)
+                        .font(.title2)
+                        .foregroundColor(.secondary)
                 }
                 .padding(.horizontal)
-                
+
+                Divider()
+
                 // App Description
-                if !app.localizedDescription.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
                     Text("Description")
                         .font(.headline)
-                        .padding(.horizontal)
-                    
+
                     Text(app.localizedDescription)
                         .font(.body)
-                        .padding(.horizontal)
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.leading)
                 }
-                
+                .padding(.horizontal)
+
                 // Screenshots
-                if let screenshotURLs = app.screenshotURLs, !screenshotURLs.isEmpty {
+                if let screenshots = app.screenshotURLs, !screenshots.isEmpty {
+                    Divider()
                     Text("Screenshots")
                         .font(.headline)
                         .padding(.horizontal)
-                    
-                    ScrollView(.horizontal, showsIndicators: true) {
+
+                    ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
-                            ForEach(screenshotURLs, id: \.self) { url in
+                            ForEach(screenshots, id: \.self) { url in
                                 AsyncImage(url: URL(string: url)) { image in
                                     image.resizable()
+                                        .scaledToFill()
+                                        .frame(width: 200, height: 400)
+                                        .clipped()
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        .shadow(radius: 4)
                                 } placeholder: {
                                     Color.gray.opacity(0.3)
+                                        .frame(width: 200, height: 400)
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
                                 }
-                                .frame(width: 250, height: 150)
-                                .cornerRadius(10)
                             }
                         }
                         .padding(.horizontal)
                     }
                 }
+
+                // Tint Color (Visual)
+                if let tintColor = app.tintColor {
+                    Divider()
+                    HStack {
+                        Text("Tint Color")
+                            .font(.headline)
+
+                        Spacer()
+
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color(hex: tintColor))
+                            .frame(width: 30, height: 30)
+                            .shadow(radius: 3)
+                    }
+                    .padding(.horizontal)
+                }
             }
-            .navigationTitle(app.name)
+            .padding(.bottom, 20)
         }
+        .navigationTitle(app.name)
+        .background(Color.gray.opacity(0.1))
     }
 }
 
+// MARK: - Color Extension for Hex Colors
+extension Color {
+    init(hex: String) {
+        let scanner = Scanner(string: hex.replacingOccurrences(of: "#", with: ""))
+        var rgb: UInt64 = 0
+        scanner.scanHexInt64(&rgb)
+        let red = Double((rgb >> 16) & 0xFF) / 255.0
+        let green = Double((rgb >> 8) & 0xFF) / 255.0
+        let blue = Double(rgb & 0xFF) / 255.0
+        self.init(red: red, green: green, blue: blue)
+    }
+}
