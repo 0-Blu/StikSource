@@ -36,7 +36,7 @@ import StikSource
 
 struct ContentView: View {
     var body: some View {
-        StikSourceView(sourceURL: "https://quarksources.github.io/altstore-complete.json")
+        StikSourceView(sourceURL: "placeholder")
     }
 }
 
@@ -84,7 +84,7 @@ struct ManualFetchView: View {
     @StateObject private var manager = StikSourceManager()
     @State private var isLoading = false
 
-    let sourceURL = "https://quarksources.github.io/altstore-complete.json"
+    let sourceURL = "placeholder"
 
     var body: some View {
         VStack {
