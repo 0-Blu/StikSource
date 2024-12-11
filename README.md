@@ -8,6 +8,7 @@
 - Provides a SwiftUI-friendly way to display the source content.
 - Allows navigation to view detailed app data.
 - Compatible with **iOS 15+** and **macOS 12+**.
+- Supports **v1 and v2** sources.
 
 ---
 
