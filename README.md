@@ -6,6 +6,7 @@
 
 - Fetches and decodes AltStore source JSON.
 - Provides a SwiftUI-friendly way to display the source content.
+- Allows navigation to view detailed app data.
 - Compatible with **iOS 15+** and **macOS 12+**.
 
 ---
@@ -28,7 +29,7 @@
 
 ### SwiftUI Example
 
-Here’s an example of how you can use **StikSource** to fetch and display data from a source URL.
+Here’s an example of how you can use **StikSource** to fetch and display data from a source URL, with navigation to view app details.
 
 ```swift
 import SwiftUI
@@ -55,6 +56,13 @@ This will fetch the data from the provided URL and display:
 
 - **Source Name**
 - **List of Apps** with icons, names, and developer information.
+- Tapping an app navigates to a **Detail View** showing:
+  - App Icon
+  - App Name
+  - Developer
+  - Description
+  - Screenshots
+  - Additional metadata.
 
 ---
 
@@ -168,9 +176,3 @@ Feel free to use and modify it for your projects.
 
 **0-Blu**  
 [GitHub Profile](https://github.com/0-Blu)
-
----
-
-### Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. 🚀
