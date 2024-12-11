@@ -1,126 +1,47 @@
-# **StikSource**
+# StikSource
 
-StikSource is a Swift package designed to decode and display **AltStore-compatible sources** from remote URLs. It parses AltStore 2.0 JSON source files and allows you to interact with the data using SwiftUI.
+**StikSource** is a Swift Package for fetching and decoding **AltStore-compatible JSON source data** from a given URL. It provides a simple API and SwiftUI views to display the decoded data in your app.
+
+## Features
+
+- Fetches and decodes AltStore source JSON.
+- Provides a SwiftUI-friendly way to display the source content.
+- Compatible with **iOS 15+** and **macOS 12+**.
 
 ---
 
-## **Features**
-- Fetches AltStore 2.0 source JSON from any URL.
-- Decodes all source fields, including apps, versions, permissions, and news.
-- Provides an easy-to-use SwiftUI interface to display the source details.
+## Installation
 
----
-
-## **Installation**
+### Using Swift Package Manager (SPM)
 
 1. Open your Xcode project.
-2. Go to **File > Add Packages**.
-3. Enter the following URL for the Swift Package:
+2. Go to **File > Add Packages...**.
+3. Enter the repository URL:
    ```
    https://github.com/0-Blu/StikSource.git
    ```
-4. Add the `StikSource` dependency to your desired target.
+4. Add the **StikSource** package to your project.
 
 ---
 
-## **Usage**
+## Sample Usage
 
-Here’s an example of fetching and displaying AltStore source data in SwiftUI.
+### SwiftUI Example
 
-### **1. Import StikSource**
-First, import the package:
-
-```swift
-import StikSource
-import SwiftUI
-```
-
----
-
-### **2. Fetch Source JSON and Display Data**
-
-This example fetches the source from a URL and displays key details:
+Here’s an example of how you can use **StikSource** to fetch and display data from a source URL.
 
 ```swift
 import SwiftUI
 import StikSource
 
 struct ContentView: View {
-    @State private var source: Source?
-    @State private var errorMessage: String?
-    
     var body: some View {
-        NavigationView {
-            VStack {
-                if let source = source {
-                    List {
-                        // Source Details
-                        Section(header: Text("Source Details")) {
-                            Text("Name: \(source.name)")
-                            if let subtitle = source.subtitle {
-                                Text("Subtitle: \(subtitle)")
-                            }
-                            if let description = source.description {
-                                Text(description)
-                            }
-                        }
-                        
-                        // Apps List
-                        Section(header: Text("Apps")) {
-                            ForEach(source.apps, id: \.bundleIdentifier) { app in
-                                VStack(alignment: .leading) {
-                                    Text(app.name)
-                                        .font(.headline)
-                                    Text(app.localizedDescription)
-                                        .font(.subheadline)
-                                }
-                                .padding(5)
-                            }
-                        }
-                    }
-                } else if let errorMessage = errorMessage {
-                    // Display error if loading fails
-                    Text("Error: \(errorMessage)")
-                        .foregroundColor(.red)
-                } else {
-                    // Loading indicator
-                    ProgressView("Loading Source...")
-                }
-            }
-            .onAppear(perform: loadSource)
-            .navigationTitle("StikSource Example")
-        }
-    }
-
-    // Fetch the AltStore source JSON
-    private func loadSource() {
-        guard let url = URL(string: "https://altstore.oatmealdome.me") else {
-            errorMessage = "Invalid URL"
-            return
-        }
-        
-        StikSourceLoader.fetchSource(from: url) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let loadedSource):
-                    self.source = loadedSource
-                case .failure(let error):
-                    self.errorMessage = "Failed to load source: \(error.localizedDescription)"
-                }
-            }
-        }
+        StikSourceView(sourceURL: "https://quarksources.github.io/altstore-complete.json")
     }
 }
-```
 
----
-
-### **3. Display the SwiftUI View**
-Set `ContentView` as your app’s entry point:
-
-```swift
 @main
-struct StikSourceExampleApp: App {
+struct MyApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -129,54 +50,127 @@ struct StikSourceExampleApp: App {
 }
 ```
 
----
+### Output
+This will fetch the data from the provided URL and display:
 
-## **Screenshot**
-
-When the above example runs, it will display:
-- **Source Details**: Name, subtitle, and description.
-- **Apps**: A list of apps with their names and descriptions.
+- **Source Name**
+- **List of Apps** with icons, names, and developer information.
 
 ---
 
-## **Sample JSON for Testing**
+## SwiftUI `StikSourceView`
 
-To test locally, you can use this sample JSON:
+`StikSourceView` is a prebuilt SwiftUI view to display the fetched AltStore source data.
 
-```json
-{
-    "name": "Example Source",
-    "subtitle": "All my apps in one place.",
-    "description": "Welcome to my AltStore source!",
-    "apps": [
-        {
-            "name": "My Example App",
-            "bundleIdentifier": "com.example.myapp",
-            "localizedDescription": "This is an awesome app.",
-            "versions": [
-                {
-                    "version": "1.0",
-                    "downloadURL": "https://example.com/myapp.ipa",
-                    "size": 10000000
+### Parameters
+
+| Parameter     | Type         | Description                          |
+|---------------|--------------|--------------------------------------|
+| `sourceURL`   | `String`     | The URL of the AltStore JSON source. |
+
+---
+
+## Manual Fetching
+
+If you want more control, you can fetch and decode the source data manually using `StikSourceManager`.
+
+### Example
+
+```swift
+import SwiftUI
+import StikSource
+
+struct ManualFetchView: View {
+    @StateObject private var manager = StikSourceManager()
+    @State private var isLoading = false
+
+    let sourceURL = "https://quarksources.github.io/altstore-complete.json"
+
+    var body: some View {
+        VStack {
+            if isLoading {
+                ProgressView("Loading...")
+            } else if let source = manager.source {
+                Text(source.name)
+                    .font(.largeTitle)
+                    .padding()
+
+                List(source.apps) { app in
+                    HStack {
+                        AsyncImage(url: URL(string: app.iconURL)) { image in
+                            image.resizable()
+                        } placeholder: {
+                            Color.gray.opacity(0.3)
+                        }
+                        .frame(width: 50, height: 50)
+                        .cornerRadius(10)
+
+                        VStack(alignment: .leading) {
+                            Text(app.name).font(.headline)
+                            Text(app.developerName)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                    }
                 }
-            ]
+            } else {
+                Text("No data available.")
+            }
         }
-    ]
+        .task {
+            isLoading = true
+            do {
+                try await manager.fetchSource(from: sourceURL)
+                isLoading = false
+            } catch {
+                print("Failed to fetch data: \(error.localizedDescription)")
+                isLoading = false
+            }
+        }
+    }
 }
 ```
 
 ---
 
-## **Requirements**
-- **iOS 13+** / **macOS 10.15+**
-- Swift Package Manager
+## Testing
+
+Run the included test suite to verify the package functionality:
+
+```bash
+swift test
+```
+
+### Test File: `StikSourceTests.swift`
+
+The test suite verifies:
+- Successful fetching of source JSON.
+- Correct decoding of source and app data.
 
 ---
 
-## **License**
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for more details.
+## Requirements
+
+- **iOS 15+**
+- **macOS 12+**
+- Swift 5.5+
 
 ---
 
-## **Credits**
-Built by **0-Blu**.
+## License
+
+This package is licensed under the **MIT License**.  
+Feel free to use and modify it for your projects.
+
+---
+
+## Author
+
+**0-Blu**  
+[GitHub Profile](https://github.com/0-Blu)
+
+---
+
+### Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. 🚀
