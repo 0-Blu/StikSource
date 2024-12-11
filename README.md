@@ -142,22 +142,6 @@ struct ManualFetchView: View {
 
 ---
 
-## Testing
-
-Run the included test suite to verify the package functionality:
-
-```bash
-swift test
-```
-
-### Test File: `StikSourceTests.swift`
-
-The test suite verifies:
-- Successful fetching of source JSON.
-- Correct decoding of source and app data.
-
----
-
 ## Requirements
 
 - **iOS 15+**
