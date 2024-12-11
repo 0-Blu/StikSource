@@ -5,7 +5,6 @@
 //  Created by Stephen on 12/11/24.
 //
 
-
 import SwiftUI
 
 struct AppDetailView: View {
@@ -13,62 +12,107 @@ struct AppDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 15) {
+            VStack(alignment: .leading, spacing: 20) {
+                // App Icon
                 AsyncImage(url: URL(string: app.iconURL)) { image in
-                    image.resizable().scaledToFit()
+                    image.resizable()
+                        .scaledToFit()
                 } placeholder: {
                     Color.gray.opacity(0.3)
                 }
                 .frame(width: 120, height: 120)
-                .cornerRadius(20)
-                .padding()
+                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .shadow(radius: 5)
+                .padding(.horizontal)
 
+                // App Title & Developer
                 VStack(alignment: .leading, spacing: 10) {
                     Text(app.name)
                         .font(.largeTitle)
-                        .bold()
+                        .fontWeight(.bold)
 
-                    Text("Developer: \(app.developerName)")
+                    Text("by \(app.developerName)")
                         .font(.title2)
                         .foregroundColor(.secondary)
+                }
+                .padding(.horizontal)
 
-                    Divider()
+                Divider()
 
+                // App Description
+                VStack(alignment: .leading, spacing: 10) {
                     Text("Description")
                         .font(.headline)
+
                     Text(app.localizedDescription)
                         .font(.body)
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.leading)
+                }
+                .padding(.horizontal)
 
+                // Screenshots
+                if let screenshots = app.screenshotURLs {
                     Divider()
+                    Text("Screenshots")
+                        .font(.headline)
+                        .padding(.horizontal)
 
-                    if let screenshots = app.screenshotURLs {
-                        Text("Screenshots")
-                            .font(.headline)
-                        ScrollView(.horizontal) {
-                            HStack {
-                                ForEach(screenshots, id: \.self) { url in
-                                    AsyncImage(url: URL(string: url)) { image in
-                                        image.resizable().scaledToFit()
-                                    } placeholder: {
-                                        Color.gray.opacity(0.3)
-                                    }
-                                    .frame(width: 200, height: 400)
-                                    .cornerRadius(10)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(screenshots, id: \.self) { url in
+                                AsyncImage(url: URL(string: url)) { image in
+                                    image.resizable()
+                                        .scaledToFill()
+                                        .frame(width: 200, height: 400)
+                                        .clipped()
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        .shadow(radius: 4)
+                                } placeholder: {
+                                    Color.gray.opacity(0.3)
+                                        .frame(width: 200, height: 400)
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
                                 }
                             }
                         }
-                    }
-
-                    Divider()
-
-                    if let tintColor = app.tintColor {
-                        Text("Tint Color: \(tintColor)")
-                            .font(.headline)
+                        .padding(.horizontal)
                     }
                 }
-                .padding()
+
+                // Tint Color (Visual)
+                if let tintColor = app.tintColor {
+                    Divider()
+                    HStack {
+                        Text("Tint Color")
+                            .font(.headline)
+
+                        Spacer()
+
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color(hex: tintColor))
+                            .frame(width: 30, height: 30)
+                            .shadow(radius: 3)
+                    }
+                    .padding(.horizontal)
+                }
             }
+            .padding(.bottom, 20)
         }
         .navigationTitle(app.name)
+        .background(Color.gray.opacity(0.1))
     }
 }
+
+// MARK: - Color Extension for Hex Colors
+extension Color {
+    init(hex: String) {
+        let scanner = Scanner(string: hex.replacingOccurrences(of: "#", with: ""))
+        var rgb: UInt64 = 0
+        scanner.scanHexInt64(&rgb)
+        let red = Double((rgb >> 16) & 0xFF) / 255.0
+        let green = Double((rgb >> 8) & 0xFF) / 255.0
+        let blue = Double(rgb & 0xFF) / 255.0
+        self.init(red: red, green: green, blue: blue)
+    }
+}
+
