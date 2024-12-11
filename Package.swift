@@ -1,19 +1,16 @@
-// swift-tools-version:5.9
-
+// swift-tools-version:5.7
 import PackageDescription
 
 let package = Package(
     name: "StikSource",
     platforms: [
-        .iOS(.v13),
-        .macOS(.v10_15)
+        .iOS(.v15),         // iOS support
+        .macOS(.v12)        // macOS support (macOS 12 Monterey and above)
     ],
     products: [
-        .library(
-            name: "StikSource",
-            targets: ["StikSource"]
-        ),
+        .library(name: "StikSource", targets: ["StikSource"]),
     ],
+    dependencies: [],
     targets: [
         .target(
             name: "StikSource",
@@ -25,4 +22,3 @@ let package = Package(
         ),
     ]
 )
-
