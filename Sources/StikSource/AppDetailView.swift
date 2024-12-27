@@ -5,6 +5,8 @@
 //  Created by Stephen on 12/11/24.
 //
 
+import SwiftUI
+
 public struct AppDetailView: View {
     public let app: App
 
