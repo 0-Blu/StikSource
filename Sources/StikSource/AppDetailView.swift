@@ -5,6 +5,8 @@
 //  Created by Stephen on 12/11/24.
 //
 
+import SwiftUI
+
 public struct AppDetailView: View {
     public let app: App
 
@@ -97,34 +99,23 @@ public struct AppDetailView: View {
                     }
                     .padding(.horizontal)
                 }
-
-                // IPA Download Button
-                if let downloadURL = app.versions.first?.downloadURL {
-                    Divider()
-                    Button(action: {
-                        if let url = URL(string: downloadURL) {
-                            UIApplication.shared.open(url)
-                        }
-                    }) {
-                        HStack {
-                            Spacer()
-                            Text("Download IPA")
-                                .font(.headline)
-                                .padding()
-                                .foregroundColor(.white)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color.accentColor)
-                                )
-                            Spacer()
-                        }
-                    }
-                    .padding(.horizontal)
-                }
             }
             .padding(.bottom, 20)
         }
         .navigationTitle(app.name)
-        .background(app.tintColor.map { Color(hex: $0).opacity(0.2) } ?? Color.gray.opacity(0.1))
+        .background(Color.gray.opacity(0.1))
+    }
+}
+
+// MARK: - Color Extension for Hex Colors
+extension Color {
+    init(hex: String) {
+        let scanner = Scanner(string: hex.replacingOccurrences(of: "#", with: ""))
+        var rgb: UInt64 = 0
+        scanner.scanHexInt64(&rgb)
+        let red = Double((rgb >> 16) & 0xFF) / 255.0
+        let green = Double((rgb >> 8) & 0xFF) / 255.0
+        let blue = Double(rgb & 0xFF) / 255.0
+        self.init(red: red, green: green, blue: blue)
     }
 }
