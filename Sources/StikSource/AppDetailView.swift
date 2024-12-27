@@ -101,26 +101,34 @@ public struct AppDetailView: View {
                 }
 
                 // IPA Download Button
-                Divider()
                 Button(action: {
-                    // Add the action for downloading the IPA
-                    print("Download \(app.name) IPA")
+                    // Handle IPA download logic
+                    if let ipaURL = URL(string: app.ipaURL) {
+                        UIApplication.shared.open(ipaURL)
+                    }
                 }) {
-                    Text("Download IPA")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(hex: app.tintColor ?? "#007BFF"))
-                        .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .shadow(radius: 4)
+                    HStack {
+                        Spacer()
+                        Text("Download IPA")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.blue)
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .shadow(radius: 3)
+                        Spacer()
+                    }
                 }
                 .padding(.horizontal)
             }
             .padding(.bottom, 20)
         }
         .navigationTitle(app.name)
-        .background(Color(hex: app.tintColor ?? "#F0F0F0").opacity(0.1))
+        .background(
+            Color(hex: app.tintColor ?? "#F2F2F7") // Default fallback color
+                .edgesIgnoringSafeArea(.all)
+        )
     }
 }
 
@@ -135,4 +143,15 @@ extension Color {
         let blue = Double(rgb & 0xFF) / 255.0
         self.init(red: red, green: green, blue: blue)
     }
+}
+
+// Example `App` Model (for context)
+public struct App {
+    public let name: String
+    public let developerName: String
+    public let iconURL: String
+    public let localizedDescription: String
+    public let screenshotURLs: [String]?
+    public let tintColor: String?
+    public let ipaURL: String
 }
