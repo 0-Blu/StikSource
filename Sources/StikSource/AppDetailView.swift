@@ -9,6 +9,9 @@ import SwiftUI
 
 public struct AppDetailView: View {
     public let app: App
+    @State private var isDownloading = false
+    @State private var downloadProgress: Double = 0
+    @State private var downloadCompleted = false
 
     public init(app: App) {
         self.app = app
@@ -83,28 +86,14 @@ public struct AppDetailView: View {
                     }
                 }
 
-                // Tint Color (Visual)
-                if let tintColor = app.tintColor {
-                    Divider()
-                    HStack {
-                        Text("Tint Color")
-                            .font(.headline)
-
-                        Spacer()
-
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color(hex: tintColor))
-                            .frame(width: 30, height: 30)
-                            .shadow(radius: 3)
-                    }
-                    .padding(.horizontal)
-                }
-
                 // IPA Download Button
-                if let ipaURL = app.ipaURL, let url = URL(string: ipaURL) {
-                    Divider()
+                Divider()
+                if isDownloading {
+                    ProgressView(value: downloadProgress)
+                        .padding(.horizontal)
+                } else {
                     Button(action: {
-                        UIApplication.shared.open(url)
+                        downloadIPA()
                     }) {
                         Text("Download IPA")
                             .font(.headline)
@@ -122,7 +111,55 @@ public struct AppDetailView: View {
         }
         .navigationTitle(app.name)
         .background(Color(hex: app.tintColor ?? "#F0F0F0").opacity(0.1))
+        .alert(isPresented: $downloadCompleted) {
+            Alert(title: Text("Download Complete"), message: Text("The IPA file has been downloaded."), dismissButton: .default(Text("OK")))
+        }
     }
+
+    private func downloadIPA() {
+        guard let ipaURL = URL(string: app.ipaURL) else { return }
+        isDownloading = true
+
+        let task = URLSession.shared.downloadTask(with: ipaURL) { location, response, error in
+            DispatchQueue.main.async {
+                isDownloading = false
+                if let location = location, error == nil {
+                    saveDownloadedFile(from: location)
+                    downloadCompleted = true
+                } else {
+                    // Handle errors appropriately
+                    print("Download failed: \(error?.localizedDescription ?? "Unknown error")")
+                }
+            }
+        }
+
+        task.resume()
+    }
+
+    private func saveDownloadedFile(from location: URL) {
+        let fileManager = FileManager.default
+        let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+
+        let destinationURL = documentsURL.appendingPathComponent(app.name + ".ipa")
+        try? fileManager.removeItem(at: destinationURL) // Remove existing file if it exists
+        do {
+            try fileManager.copyItem(at: location, to: destinationURL)
+            print("File saved to: \(destinationURL)")
+        } catch {
+            print("File save error: \(error.localizedDescription)")
+        }
+    }
+}
+
+// MARK: - App Model Example
+public struct App {
+    let name: String
+    let developerName: String
+    let iconURL: String
+    let localizedDescription: String
+    let screenshotURLs: [String]?
+    let tintColor: String?
+    let ipaURL: String // Add this property for the IPA download link
 }
 
 // MARK: - Color Extension for Hex Colors
