@@ -101,32 +101,57 @@ public struct AppDetailView: View {
                 }
 
                 // IPA Download Button
-                if let downloadURL = app.versions.first?.downloadURL {
-                    Divider()
-                    Button(action: {
-                        if let url = URL(string: downloadURL) {
-                            UIApplication.shared.open(url)
-                        }
-                    }) {
-                        HStack {
-                            Spacer()
-                            Text("Download IPA")
-                                .font(.headline)
-                                .padding()
-                                .foregroundColor(.white)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color.accentColor)
-                                )
-                            Spacer()
-                        }
+                Button(action: {
+                    // Handle IPA download logic
+                    if let ipaURL = URL(string: app.ipaURL) {
+                        UIApplication.shared.open(ipaURL)
                     }
-                    .padding(.horizontal)
+                }) {
+                    HStack {
+                        Spacer()
+                        Text("Download IPA")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.blue)
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .shadow(radius: 3)
+                        Spacer()
+                    }
                 }
+                .padding(.horizontal)
             }
             .padding(.bottom, 20)
         }
         .navigationTitle(app.name)
-        .background(app.tintColor.map { Color(hex: $0).opacity(0.2) } ?? Color.gray.opacity(0.1))
+        .background(
+            Color(hex: app.tintColor ?? "#F2F2F7") // Default fallback color
+                .edgesIgnoringSafeArea(.all)
+        )
     }
+}
+
+// MARK: - Color Extension for Hex Colors
+extension Color {
+    init(hex: String) {
+        let scanner = Scanner(string: hex.replacingOccurrences(of: "#", with: ""))
+        var rgb: UInt64 = 0
+        scanner.scanHexInt64(&rgb)
+        let red = Double((rgb >> 16) & 0xFF) / 255.0
+        let green = Double((rgb >> 8) & 0xFF) / 255.0
+        let blue = Double(rgb & 0xFF) / 255.0
+        self.init(red: red, green: green, blue: blue)
+    }
+}
+
+// Example `App` Model (for context)
+public struct App {
+    public let name: String
+    public let developerName: String
+    public let iconURL: String
+    public let localizedDescription: String
+    public let screenshotURLs: [String]?
+    public let tintColor: String?
+    public let ipaURL: String
 }
