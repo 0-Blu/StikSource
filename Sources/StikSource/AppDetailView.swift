@@ -100,6 +100,7 @@ public struct AppDetailView: View {
                     .padding(.horizontal)
                 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
                 // IPA Download Button
                 if let ipaURL = app.ipaURL, let url = URL(string: ipaURL) {
@@ -120,12 +121,18 @@ public struct AppDetailView: View {
                 }
 =======
 >>>>>>> parent of c31261c (Update AppDetailView.swift)
+=======
+>>>>>>> parent of c31261c (Update AppDetailView.swift)
             }
             .padding(.bottom, 20)
         }
         .navigationTitle(app.name)
 <<<<<<< HEAD
+<<<<<<< HEAD
         .background(Color(hex: app.tintColor ?? "#F0F0F0").opacity(0.1))
+=======
+        .background(Color.gray.opacity(0.1))
+>>>>>>> parent of c31261c (Update AppDetailView.swift)
 =======
         .background(Color.gray.opacity(0.1))
 >>>>>>> parent of c31261c (Update AppDetailView.swift)
