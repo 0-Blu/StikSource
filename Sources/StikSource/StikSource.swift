@@ -30,7 +30,6 @@ public struct App: Codable, Identifiable {
     public let screenshotURLs: [String]?
     public let versions: [Version]
     public let appPermissions: AppPermissions?
-    public let ipaURL: String? // Added ipaURL property
 }
 
 // MARK: - Version Model
