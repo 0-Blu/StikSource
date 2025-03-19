@@ -102,8 +102,6 @@ public struct AppDetailView: View {
             }
             .padding(.bottom, 20)
         }
-        .navigationTitle(app.name)
-        .background(Color.gray.opacity(0.1))
     }
 }
 
